@@ -1,11 +1,16 @@
 #pragma once
 
 #define GLFW_INCLUDE_GLU
-#include <GLFW/glfw3.h>
+#include "GLFW/glfw3.h"
 
 #include "common.h"
 
 namespace Settings {
+
+const u32 graphics_resolution_width = 1920;
+const u32 graphics_resolution_height = 1080;
+const bool graphics_fullscreen = true;
+const bool graphics_borderless = true;
 
 const i32 key_playground_rotate_left = GLFW_KEY_LEFT;
 const i32 key_playground_rotate_right = GLFW_KEY_RIGHT;
@@ -20,6 +25,7 @@ const i32 key_block_horiz_rot_counterclock = GLFW_KEY_D;
 const i32 key_block_move_away = GLFW_KEY_Q;
 const i32 key_block_move_towards = GLFW_KEY_E;
 const i32 key_block_accelerate = GLFW_KEY_SPACE;
+const i32 key_quit = GLFW_KEY_ESCAPE;
 
 // const u32 map_width = 10;
 // const u32 map_depth = 10;

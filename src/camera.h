@@ -103,8 +103,13 @@ class PerspectiveCamera : public Camera {
         is_valid_projection = false;
     }
 
+    void SetAspectRatio(f32 aspect) {
+        aspect_ratio = aspect;
+        is_valid_projection = false;
+    }
+
   private:
-    f32 aspect_ratio = 800.f / 600.f;
+    f32 aspect_ratio = 1.0f;
     f32 fov = glm::pi<f32>() / 2.f;
     f32 near = 0.1f;
     f32 far = 100.f;

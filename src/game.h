@@ -22,6 +22,9 @@ class Game {
                                    game_state.board.height / 2.f,
                                    game_state.board.depth / 2.f));
         camera.SetUp(glm::vec3(0.f, 1.f, 0.f));
+        camera.SetAspectRatio(
+            Settings::graphics_resolution_width /
+            static_cast<f32>(Settings::graphics_resolution_height));
 
         return true;
     }

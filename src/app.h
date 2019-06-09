@@ -1,13 +1,14 @@
 #pragma once
 
 #define GLFW_INCLUDE_GLU
-#include <GLFW/glfw3.h>
 #include <chrono>
 #include <stdio.h>
 #include <thread>
 
+#include "GLFW/glfw3.h"
 #include "game.h"
 #include "input.h"
+#include "settings.h"
 
 void OnFramebufferResize(GLFWwindow* window, i32 width, i32 height);
 void OnKeyCallback(GLFWwindow* window, i32 key, i32 scancode, i32 action,
@@ -72,6 +73,8 @@ class Tetris3DApp {
     }
 
   private:
+    const char* window_title = "Tetris3d";
+    GLFWmonitor* monitor = nullptr;
     GLFWwindow* window = nullptr;
     Timer timer;
     InputState input;
@@ -84,7 +87,27 @@ class Tetris3DApp {
         // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
         // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-        window = glfwCreateWindow(800, 600, "Tetris3d", nullptr, nullptr);
+        if (Settings::graphics_fullscreen && Settings::graphics_borderless) {
+            monitor = glfwGetPrimaryMonitor();
+            const GLFWvidmode* video_mode = glfwGetVideoMode(monitor);
+            glfwWindowHint(GLFW_RED_BITS, video_mode->redBits);
+            glfwWindowHint(GLFW_GREEN_BITS, video_mode->greenBits);
+            glfwWindowHint(GLFW_BLUE_BITS, video_mode->blueBits);
+            glfwWindowHint(GLFW_REFRESH_RATE, video_mode->refreshRate);
+            window = glfwCreateWindow(video_mode->width, video_mode->height,
+                                      window_title, monitor, nullptr);
+        } else if (Settings::graphics_fullscreen) {
+            window =
+                glfwCreateWindow(Settings::graphics_resolution_width,
+                                 Settings::graphics_resolution_height,
+                                 "Tetris3d", glfwGetPrimaryMonitor(), nullptr);
+        } else {
+            window =
+                glfwCreateWindow(Settings::graphics_resolution_width,
+                                 Settings::graphics_resolution_height,
+                                 "Tetris3d", nullptr, nullptr);
+        }
+
         if (!window) {
             printf("Failed to create GLFW window\n");
             glfwTerminate();

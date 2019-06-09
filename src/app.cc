@@ -15,4 +15,8 @@ void OnKeyCallback(GLFWwindow* window, i32 key, i32 scancode, i32 action,
     if (app) {
         app->OnKeyChanged(key, scancode, action, mods);
     }
+
+    if (key == Settings::key_quit && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
 }
