@@ -9,6 +9,7 @@ else
 CCFLAGS=-std=c++17 \
 	-Wall -Wno-deprecated-declarations\
 	-g \
+	-static-libstdc++ -static-libgcc \
 	-lGLU -lGL -lX11 -lpthread -lXrandr -lXi -ldl
 endif
 
