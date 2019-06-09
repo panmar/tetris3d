@@ -44,6 +44,17 @@ class Tetris3DApp {
             return;
         }
 
+        // NOTE(panmar): Even if we set glfwSetFramebufferSizeCallback callback
+        // during Tetris3DApp::StartUp(), for some reason it is not triggered
+        // when framebuffer is initialized, so, at the beginning, we need to
+        // trigger it manually
+        {
+            i32 framebuffer_width, framebuffer_height;
+            glfwGetFramebufferSize(window, &framebuffer_width,
+                                   &framebuffer_height);
+            game.OnFramebufferResize(framebuffer_width, framebuffer_height);
+        }
+
         timer.Tick();
         while (!glfwWindowShouldClose(window)) {
             input.Update();
@@ -117,15 +128,7 @@ class Tetris3DApp {
         // NOTE(panmar): GLFW library uses C-style global callbacks mechanism;
         // We pass App ptr here, so we can access it during global callbacks
         glfwSetWindowUserPointer(window, this);
-
-        // NOTE(panmar): Even if we set callback here, it will not be
-        // triggered when framebuffer is initialized, so, at the beginning,
-        // we need to trigger it manually
         glfwSetFramebufferSizeCallback(window, ::OnFramebufferResize);
-        i32 framebuffer_width, framebuffer_height;
-        glfwGetFramebufferSize(window, &framebuffer_width, &framebuffer_height);
-        game.OnFramebufferResize(framebuffer_width, framebuffer_height);
-
         glfwSetKeyCallback(window, OnKeyCallback);
 
         glfwMakeContextCurrent(window);
