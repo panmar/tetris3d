@@ -4,6 +4,7 @@
 #include <chrono>
 #include <stdio.h>
 #include <thread>
+#include <cstdlib>
 
 #include "GLFW/glfw3.h"
 #include "game.h"
@@ -92,6 +93,7 @@ class Tetris3DApp {
     Game game;
 
     bool StartUp() {
+        srand(time(nullptr));
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
