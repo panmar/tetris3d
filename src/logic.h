@@ -222,6 +222,8 @@ struct GameState {
 
     Phase phase = Phase::Uninitialized;
 
+    bool paused = false;
+
     // current falling block speed - can be normal or maximum (if accelerated)
     f32 block_current_speed = 0.f;
     // current normal speed (not accelerated)

@@ -4,19 +4,25 @@
 #include "GLFW/glfw3.h"
 
 #include "common.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtx/rotate_normalized_axis.hpp"
 
 namespace Settings {
 
 enum class RendererType { Basic, Advanced };
 
 const RendererType graphics_renderer_type = RendererType::Basic;
-//const RendererType graphics_renderer_type = RendererType::Advanced;
+// const RendererType graphics_renderer_type = RendererType::Advanced;
 const u32 graphics_resolution_width = 1920;
 const u32 graphics_resolution_height = 1080;
 const bool graphics_fullscreen = true;
 const bool graphics_borderless = true;
 const bool graphics_multisampling = true;
 const bool graphics_multisampling_samples = 4;
+
+const f32 camera_zoom_min_fov = glm::pi<f32>() / 8.f;
+const f32 camera_zoom_max_fov = 4.f * glm::pi<f32>() / 5.f;
 
 const i32 key_playground_rotate_left = GLFW_KEY_LEFT;
 const i32 key_playground_rotate_right = GLFW_KEY_RIGHT;
@@ -32,6 +38,8 @@ const i32 key_block_move_away = GLFW_KEY_Q;
 const i32 key_block_move_towards = GLFW_KEY_E;
 const i32 key_block_accelerate = GLFW_KEY_SPACE;
 const i32 key_quit = GLFW_KEY_ESCAPE;
+const i32 key_camera_center = GLFW_KEY_C;
+const i32 key_pause = GLFW_KEY_P;
 
 // const u32 map_width = 10;
 // const u32 map_depth = 10;

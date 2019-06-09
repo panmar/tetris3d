@@ -21,14 +21,7 @@ class Game {
             renderer = std::make_unique<AdvancedRenderer>();
         }
 
-        // TODO(panmar): Experiment with those values
-        camera.SetPosition(glm::vec3(game_state.board.width,
-                                     1.2f * game_state.board.height,
-                                     game_state.board.depth));
-        camera.SetTarget(glm::vec3(game_state.board.width / 2.f,
-                                   game_state.board.height / 2.f,
-                                   game_state.board.depth / 2.f));
-        camera.SetUp(glm::vec3(0.f, 1.f, 0.f));
+        CenterCamera(camera);
         camera.SetAspectRatio(
             Settings::graphics_resolution_width /
             static_cast<f32>(Settings::graphics_resolution_height));
@@ -42,9 +35,23 @@ class Game {
     }
 
     void Update(const InputState& input, f32 elapsed_seconds) {
+        if (input.IsKeyPressed(Settings::key_camera_center)) {
+          CenterCamera(camera);
+        }
+
         camera_controller.Update(&camera, input);
         GameLogic::Update(game_state, elapsed_seconds, input,
                           camera.GetForward());
+    }
+
+    void CenterCamera(Camera& camera) {
+        camera.SetPosition(glm::vec3(2.5f * game_state.board.width,
+                                     game_state.board.height / 2.f,
+                                     2.5f * game_state.board.depth));
+        camera.SetTarget(glm::vec3(game_state.board.width / 2.f,
+                                   game_state.board.height / 2.f,
+                                   game_state.board.depth / 2.f));
+        camera.SetUp(glm::vec3(0.f, 1.f, 0.f));
     }
 
     bool IsFinished() const {

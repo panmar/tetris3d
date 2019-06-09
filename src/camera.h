@@ -140,12 +140,19 @@ class OrbitCameraController {
 
         camera->RotateAroundTarget(up_rot, left_rot);
 
+        auto zoom_scale_step = glm::pi<f32>() / 100.f;
         if (input.IsKeyDown(Settings::key_playground_zoom_in)) {
-            camera->SetFov(camera->GetFov() + glm::pi<f32>() / 100.f);
+            auto fov = camera->GetFov();
+            fov += zoom_scale_step;
+            fov = std::min(fov, Settings::camera_zoom_max_fov);
+            camera->SetFov(fov);
         }
 
         if (input.IsKeyDown(Settings::key_playground_zoom_out)) {
-            camera->SetFov(camera->GetFov() - glm::pi<f32>() / 100.f);
+            auto fov = camera->GetFov();
+            fov -= zoom_scale_step;
+            fov = std::max(fov,  Settings::camera_zoom_min_fov);
+            camera->SetFov(fov);
         }
 
         // TODO(panmar): Remove when move to OpenGL 3+

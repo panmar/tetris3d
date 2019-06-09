@@ -8,6 +8,8 @@ void BasicRenderer::Render(const GameLogic::GameState& state,
         glClearColor(0.2f, 0.1f, 0.1f, 1.f);
     } else if (state.phase == GameLogic::GameState::Phase::LayersErase) {
         glClearColor(0.9f, 0.9f, 0.9f, 1.f);
+    } else if (state.paused) {
+        glClearColor(0.05f, 0.08f, 0.08f, 1.f);
     } else {
         glClearColor(0.1f, 0.1f, 0.1f, 1.f);
     }
@@ -23,8 +25,8 @@ void BasicRenderer::Render(const GameLogic::GameState& state,
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     RenderBounds(state.board, camera.GetForward());
-    RenderGizmo(glm::vec3(state.board.width / 2.f, state.board.height / 2.f,
-                          state.board.depth / 2.f));
+    // RenderGizmo(glm::vec3(state.board.width / 2.f, state.board.height / 2.f,
+    //                       state.board.depth / 2.f));
 
     RenderBoard(state.board);
 

@@ -378,7 +378,11 @@ void Block::GetWorldBounds(glm::ivec3& min, glm::ivec3& max) const {
 void Update(GameState& state, f32 elapsed_seconds, const InputState& input,
             const glm::vec3& view_dir) {
 
-    if (state.phase == GameState::Phase::Lost) {
+    if (input.IsKeyPressed(Settings::key_pause)) {
+        state.paused = !state.paused;
+    }
+
+    if (state.phase == GameState::Phase::Lost || state.paused) {
         return;
     }
 
