@@ -2,9 +2,9 @@
 
 #define GLFW_INCLUDE_GLU
 #include <chrono>
+#include <cstdlib>
 #include <stdio.h>
 #include <thread>
-#include <cstdlib>
 
 #include "GLFW/glfw3.h"
 #include "game.h"
@@ -95,11 +95,18 @@ class Tetris3DApp {
     bool StartUp() {
         srand(time(nullptr));
         glfwInit();
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+
+        if (Settings::graphics_renderer_type == Settings::RendererType::Basic) {
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+        } else {
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        }
+
         glfwWindowHint(GLFW_SAMPLES, Settings::graphics_multisampling_samples);
-        // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-        // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         if (Settings::graphics_fullscreen && Settings::graphics_borderless) {
             monitor = glfwGetPrimaryMonitor();

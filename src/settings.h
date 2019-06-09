@@ -7,6 +7,10 @@
 
 namespace Settings {
 
+enum class RendererType { Basic, Advanced };
+
+// const RendererType graphics_renderer_type = RendererType::Basic;
+const RendererType graphics_renderer_type = RendererType::Advanced;
 const u32 graphics_resolution_width = 1920;
 const u32 graphics_resolution_height = 1080;
 const bool graphics_fullscreen = true;
@@ -36,7 +40,6 @@ const i32 key_quit = GLFW_KEY_ESCAPE;
 const u32 map_width = 7;
 const u32 map_depth = 7;
 const u32 map_height = 18;
-
 
 // const f32 block_init_fall_step_seconds = 1 / 5.f;
 const f32 block_init_fall_step_seconds = 1 / 1.f;

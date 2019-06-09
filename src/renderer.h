@@ -45,3 +45,11 @@ class BasicRenderer : public IRenderer {
     i32 framebuffer_width = 0;
     i32 framebuffer_height = 0;
 };
+
+class AdvancedRenderer : public IRenderer {
+  public:
+    void Render(const GameLogic::GameState& state,
+                const Camera& camera) override {}
+    void SetFramebufferWidth(i32 value) override {}
+    void SetFramebufferHeight(i32 value) override {}
+};

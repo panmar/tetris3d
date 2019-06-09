@@ -15,7 +15,12 @@
 class Game {
   public:
     bool StartUp() {
-        renderer = std::make_unique<BasicRenderer>();
+        if (Settings::graphics_renderer_type == Settings::RendererType::Basic) {
+            renderer = std::make_unique<BasicRenderer>();
+        } else {
+            renderer = std::make_unique<AdvancedRenderer>();
+        }
+
         // TODO(panmar): Experiment with those values
         camera.SetPosition(glm::vec3(game_state.board.width,
                                      1.2f * game_state.board.height,
