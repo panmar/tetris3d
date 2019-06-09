@@ -1,6 +1,6 @@
-#include "tetris3d.h"
+#include "app.h"
 
 int main() {
-    Tetris3D game;
-    game.Run();
+    Tetris3DApp app;
+    app.Run();
 }
