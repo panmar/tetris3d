@@ -108,8 +108,9 @@ class Board3D {
 
     bool Contains(const glm::ivec3& position) const {
         if (position.x < 0 || position.y < 0 || position.z < 0 ||
-            position.x >= width || position.y >= height ||
-            position.z >= depth) {
+            position.x >= static_cast<i32>(width) ||
+            position.y >= static_cast<i32>(height) ||
+            position.z >= static_cast<i32>(depth)) {
             return false;
         }
         return true;

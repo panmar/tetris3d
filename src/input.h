@@ -22,12 +22,12 @@ class InputState {
     }
 
     bool IsKeyDown(i32 key) const {
-        assert(key < keyboard.size());
+        assert(key < static_cast<i32>(keyboard.size()));
         return keyboard[key] == GLFW_PRESS;
     }
 
     bool IsKeyPressed(i32 key) const {
-        assert(key < keyboard.size());
+        assert(key < static_cast<i32>(keyboard.size()));
         return keyboard[key] == GLFW_PRESS &&
                prev_keyboard[key] == GLFW_RELEASE;
     }
