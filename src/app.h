@@ -84,6 +84,7 @@ class Tetris3DApp {
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+        glfwWindowHint(GLFW_SAMPLES, Settings::graphics_multisampling_samples);
         // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
         // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
@@ -102,10 +103,9 @@ class Tetris3DApp {
                                  Settings::graphics_resolution_height,
                                  "Tetris3d", glfwGetPrimaryMonitor(), nullptr);
         } else {
-            window =
-                glfwCreateWindow(Settings::graphics_resolution_width,
-                                 Settings::graphics_resolution_height,
-                                 "Tetris3d", nullptr, nullptr);
+            window = glfwCreateWindow(Settings::graphics_resolution_width,
+                                      Settings::graphics_resolution_height,
+                                      "Tetris3d", nullptr, nullptr);
         }
 
         if (!window) {

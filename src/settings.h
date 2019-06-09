@@ -11,6 +11,8 @@ const u32 graphics_resolution_width = 1920;
 const u32 graphics_resolution_height = 1080;
 const bool graphics_fullscreen = true;
 const bool graphics_borderless = true;
+const bool graphics_multisampling = true;
+const bool graphics_multisampling_samples = 4;
 
 const i32 key_playground_rotate_left = GLFW_KEY_LEFT;
 const i32 key_playground_rotate_right = GLFW_KEY_RIGHT;
