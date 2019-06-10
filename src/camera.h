@@ -4,6 +4,9 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/rotate_normalized_axis.hpp"
+#include "glad/glad.h"
+#define GLFW_INCLUDE_GLU
+#include "GLFW/glfw3.h"
 #include "input.h"
 #include "settings.h"
 
@@ -65,6 +68,12 @@ class Camera {
         auto direction = target - position;
         glm::vec3 new_direction = glm::vec4(direction, 0.f) * rot;
         glm::vec3 new_up = glm::vec4(up, 0.f) * rot;
+
+        if (glm::abs(glm::dot(glm::normalize(new_direction),
+                              glm::vec3(0.f, 1.f, 0.f))) > 0.999f) {
+            return;
+        }
+
         SetPosition(target - new_direction);
         SetUp(new_up);
     }
@@ -151,7 +160,7 @@ class OrbitCameraController {
         if (input.IsKeyDown(Settings::key_playground_zoom_out)) {
             auto fov = camera->GetFov();
             fov -= zoom_scale_step;
-            fov = std::max(fov,  Settings::camera_zoom_min_fov);
+            fov = std::max(fov, Settings::camera_zoom_min_fov);
             camera->SetFov(fov);
         }
 

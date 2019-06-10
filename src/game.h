@@ -20,6 +20,7 @@ class Game {
         } else {
             renderer = std::make_unique<AdvancedRenderer>();
         }
+        renderer->StartUp(game_state);
 
         CenterCamera(camera);
         camera.SetAspectRatio(

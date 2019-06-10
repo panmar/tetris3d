@@ -1,5 +1,6 @@
 #pragma once
-
+ 
+#include "glad/glad.h"
 #define GLFW_INCLUDE_GLU
 #include "GLFW/glfw3.h"
 
@@ -12,8 +13,8 @@ namespace Settings {
 
 enum class RendererType { Basic, Advanced };
 
-const RendererType graphics_renderer_type = RendererType::Basic;
-// const RendererType graphics_renderer_type = RendererType::Advanced;
+//const RendererType graphics_renderer_type = RendererType::Basic;
+const RendererType graphics_renderer_type = RendererType::Advanced;
 const u32 graphics_resolution_width = 1920;
 const u32 graphics_resolution_height = 1080;
 const bool graphics_fullscreen = true;

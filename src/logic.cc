@@ -1,11 +1,13 @@
 #include "logic.h"
+
+#include <climits>
+
 #include "glm/geometric.hpp"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/rotate_normalized_axis.hpp"
 #include "glm/vec3.hpp"
 #include "settings.h"
-#include <climits>
 
 namespace GameLogic {
 

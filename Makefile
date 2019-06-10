@@ -29,5 +29,5 @@ game: src/main.cc \
 	  src/renderer.cc \
 	  src/settings.h
 	mkdir -p bin/
-	g++ src/main.cc src/app.cc src/logic.cc src/renderer.cc \
+	g++ src/main.cc src/app.cc src/logic.cc src/renderer.cc src/glad.c \
 	extern/libglfw3.a $(CCFLAGS) -o bin/tetris3d
