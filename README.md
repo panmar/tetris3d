@@ -24,7 +24,7 @@ Requirements + my thoughts
   *acceleration 25/s felt too slow with for playground 10x10x50; 2% speed increase each 10 seconds feels unnoticeable.*
  * [rotation requirements]
  
- *Making rotation behave naturally was interesting challenge. I chose discrete representation of playground area, so I was obliged to implemented discrete rotations; I chose simple representation for blocks to make fulfilling this requirement easier. I also implemented fixing rotation when rotating a block near a wall or obstacle. I noticed that some blocks do not rotate at all (O-block). Choosing continuous block state representation would make the problem much easier, but it would certainly come biting in other areas (e.g. collisions)*
+ *Making rotation behave naturally was interesting challenge. I chose discrete representation of playground area, so I was obliged to implemented discrete rotations; I chose simple representation for blocks to make fulfilling this requirement easier. I also implemented fixing rotation when rotating a block near a wall or obstacle. I noticed that some blocks do not rotate at all (O-block). Choosing continuous block state representation would make the problem much easier, but it would certainly come short in other areas (e.g. collisions)*
  * [missing translation requirement]
  
  *There was no translation requirement. How to play tetris without translating the pieces? ;) I have implemented additional translations (Q/E) to make the game playable.*
