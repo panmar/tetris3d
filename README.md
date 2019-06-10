@@ -42,7 +42,7 @@ Requirements + my thoughts
 
 Running
 ------------
-I have compiled executable linking statically with glfw and libcpp on Ubuntu 18.04 64bit. To lunch game simply:
+I have compiled executable and linked statically with glfw and libstdc++ on Ubuntu 18.04 64bit. To lunch game simply:
 
 * run `./tetris3d`
 * make sure `data/` folder is in your working directory
@@ -58,7 +58,8 @@ Futher improvements
 * game should be made playable by experimenting with different playground dimensions and adjusting game pace
 * graphics: chosing theme would be a start, adjusting colors, postprocessing, etc.
 * I would like to made it so when a layer disappers it throws all containing cubes in all directions; it would require some physics (https://www.youtube.com/watch?v=4vG13BwerJ4)
-* filtered input, more fluent
+* filtered input, more fluent camera rotations
 * sound
-* score
-* many, many more...
+* tracking score
+* proper background animations
+* much, much more...
