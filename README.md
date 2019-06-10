@@ -53,7 +53,7 @@ Futher improvements
 -------------
 * game should be made playable by experimenting with different playground dimensions and adjusting game pace
 * graphics: chosing theme would be a start, adjusting colors, postprocessing, etc.
-* I would like to made it so when a layer disappers it splits all containing cubes in all directions; it would require some physics (https://www.youtube.com/watch?v=4vG13BwerJ4)
+* I would like to made it so when a layer disappers it throws all containing cubes in all directions; it would require some physics (https://www.youtube.com/watch?v=4vG13BwerJ4)
 * filtered input, more fluent
 * sound
 * score
