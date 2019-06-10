@@ -61,3 +61,4 @@ Futher improvements
 * filtered input, more fluent
 * sound
 * score
+* many, many more...
