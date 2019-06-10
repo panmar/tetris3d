@@ -55,6 +55,7 @@ Compilation
 
 Futher improvements
 -------------
+* some functional tests for logic (it is nicely separated so it can be easily testable)
 * more strict tetris rules (e.g. SRS - https://tetris.fandom.com/wiki/SRS)
 * game should be made playable by experimenting with different playground dimensions and adjusting game pace
 * graphics: chosing theme would be a start, adjusting colors, postprocessing, etc.
