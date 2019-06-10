@@ -55,12 +55,16 @@ Compilation
 
 Futher improvements
 -------------
+* more strict tetris rules (e.g. SRS - https://tetris.fandom.com/wiki/SRS)
 * game should be made playable by experimenting with different playground dimensions and adjusting game pace
 * graphics: chosing theme would be a start, adjusting colors, postprocessing, etc.
 * I would like to made it so when a layer disappers it throws all containing cubes in all directions; it would require some physics (https://www.youtube.com/watch?v=4vG13BwerJ4)
 * filtered input, more fluent camera rotations
 * sound
-* tracking score
+* tracking score (maybe globally?)
 * proper background animations
 * xray-ed falling blocks to reduce clutter; wireframe could be a start (depending on camera angle)
+* gui with next few pieces pieces
+* game save/load system
+* cooperative tetris 3d - map is too large for one player, so maybe bring a friend!
 * much, much more...
