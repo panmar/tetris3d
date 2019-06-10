@@ -192,6 +192,8 @@ class Board3D {
     std::vector<u32> cells;
 };
 
+// The heart of Tetris3d game
+// NOTE(panmar) all game logic state SHOULD be stored here!
 struct GameState {
     GameState(
         f32 block_init_fall_step_seconds =
@@ -211,6 +213,8 @@ struct GameState {
     Board3D board;
     Block falling_block;
 
+    // We track phases to indicate what's currently going on inside algorithm
+    // (so we can render something when certain phase occurse or play music)
     enum class Phase {
         Uninitialized,
         NewBlockCreation,
@@ -237,10 +241,11 @@ struct GameState {
     f32 seconds_to_next_block_fall = 0.f;
 };
 
+// Time-aware update
 void Update(GameState& state, f32 elapsed_seconds, const InputState& input,
             const glm::vec3& view_dir);
 
-// Time-agnostic
+// Time-agnostic update
 void SingleStep(GameState& state);
 
 bool IsFallingBlockOutOfBounds(const GameState& state);
