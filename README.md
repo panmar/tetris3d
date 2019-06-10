@@ -38,7 +38,7 @@ Requirements + my thoughts
  *Implemented with additional axis restrictions; zooming implemented by adjusting fov; if i had more time I would filter input and made it more elastic;*
  * bonus: graphic boost
  
- *No much time left to do it unfortunately. I was not sure if I have time to work on advanced graphics, so I started implementing OpenGL 2.1 renderer and only after I did most of the work with more important requirements I switched to OpenGL 3.3 (I've reimplemented whole previous renderer in core profile); I have made environment mapping and skybox; I also added projected falling blocks to help with gameplay; and some small effects indicating pause/lost /score; one nice thing under the hood I achieved is making game logic separate from rendering, so switch renderers can be made with compile time settings flag; still a lot of things to make here...*
+ *No much time left to do it unfortunately. I was not sure if I have time to work on advanced graphics, so I started implementing OpenGL 2.1 renderer and only after I did most of the work with more important requirements I switched to OpenGL 3.3 (I've reimplemented whole previous renderer in core profile); I have made environment mapping and skybox; I also added projected falling blocks to help with gameplay; and some small effects indicating pause/lost /score; one nice thing under the hood I achieved is making game logic separate from rendering, so switching renderers can be made with settings flag; still a lot of things to make here...*
 
 Running
 ------------
@@ -46,6 +46,8 @@ I have compiled executable linking statically with glfw and libcpp on Ubuntu 18.
 
 * run `./tetris3d`
 * make sure `data/` folder is in your working directory
+
+No textures packed inside executable. Yet...
 
 Compilation
 -------------
