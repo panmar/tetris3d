@@ -17,7 +17,7 @@ Requirements + my thoughts
 *I found ~7x7 more enjoyable. 10x10 is quite a lot of space to play around.*
 * when 1 layer is filled 100% the layer disappears
 
-*In 3d tetris this happens so rarely...*  ;)
+*In 3d tetris this happens so rarely...*  ;) (I assumed 1 stands for "one" not "first", here)
  * the height from which the blocks are falling is 50
   
 *I found this requirement quite problematic. 50 is too much, it is very hard to track game with such tall playground. Maybe if a player does not rotate camera and looks down constantly - like in **Blockout** - it could be enjoyable. Otherwise I would suggest to make it shorter (~20)*
