@@ -62,4 +62,5 @@ Futher improvements
 * sound
 * tracking score
 * proper background animations
+* xray-ed falling blocks to reduce clutter; wireframe could be a start (depending on camera angle)
 * much, much more...
