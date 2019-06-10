@@ -77,12 +77,29 @@ class Shader {
     u32 id = 0;
 };
 
+class SkyBox {
+  public:
+    ~SkyBox();
+    void Create();
+    void Render(Shader shader, const Camera& camera);
+
+    // Load order: X, -X, Y, -Y, Z, -Z
+    u32 LoadCubemap(const std::vector<std::string>& paths);
+
+    Color color = Color{1.f, 1.f, 1.f, 1.f};
+    u32 vao = 0;
+    u32 vbo = 0;
+    u32 texture = 0;
+};
+
 class Cube {
   public:
     void Create(f32 width, f32 depth, f32 height);
     ~Cube();
     void Render(Shader shader, const Color& color, const glm::mat4& world,
                 const Camera& camera);
+    void RenderRefract(Shader shader, const Color& color, const SkyBox& skybox,
+                       const glm::mat4& world, const Camera& camera);
 
   private:
     u32 vbo = 0;
@@ -127,10 +144,16 @@ class AdvancedRenderer : public IRenderer {
     void RenderCube(const glm::vec3& position, const Color& color,
                     const glm::vec3& scale, const Camera& camera);
 
+    void RenderRefractCube(const glm::vec3& position, const Color& color,
+                           const glm::vec3& scale, const Camera& camera);
+
     i32 framebuffer_width = 0;
     i32 framebuffer_height = 0;
 
     Shader solid_shader;
+    Shader refract_shader;
+    Shader skybox_shader;
     Cube tetris_cube;
     BoardBounds board_bounds;
+    SkyBox skybox;
 };

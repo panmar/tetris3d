@@ -1,11 +1,15 @@
 #include "renderer.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 namespace {
 
 const std::string solid_vs = R"~(
 
 #version 330 core
 layout (location = 0) in vec3 position;
+layout (location = 1) in vec3 normal;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -26,6 +30,83 @@ uniform vec4 color;
 
 void main() {
     final_color = color;
+}
+
+)~";
+
+const std::string refract_vs = R"~(
+
+#version 330 core
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aNormal;
+
+out vec3 Normal;
+out vec3 Position;
+
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
+void main() {
+    Normal = mat3(transpose(inverse(model))) * aNormal;
+    Position = vec3(model * vec4(aPos, 1.0));
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
+}
+
+)~";
+
+const std::string refract_fs = R"~(
+
+#version 330 core
+out vec4 final_color;
+
+in vec3 Normal;
+in vec3 Position;
+
+uniform vec3 camera_pos;
+uniform samplerCube skybox;
+uniform vec4 color;
+
+void main() {             
+    vec3 I = normalize(Position - camera_pos);
+    vec3 R = reflect(I, normalize(Normal));
+    vec4 texture_color = vec4(texture(skybox, R).rgb, color.a);
+    vec4 mixed_color = mix(color, texture_color, 0.4);
+    final_color = mixed_color;
+}
+
+)~";
+
+const std::string skybox_vs = R"~(
+
+#version 330 core
+layout (location = 0) in vec3 position;
+
+out vec3 tex_coords;
+
+uniform mat4 projection;
+uniform mat4 view;
+
+void main() {
+    tex_coords = position;
+    vec4 pos = projection * view * vec4(position, 1.0);
+    gl_Position = pos.xyww;
+}
+
+)~";
+
+const std::string skybox_fs = R"~(
+
+#version 330 core
+out vec4 final_color;
+
+in vec3 tex_coords;
+
+uniform samplerCube skybox;
+uniform vec4 color;
+
+void main() {    
+    final_color = color * texture(skybox, tex_coords) * 0.75;
 }
 
 )~";
@@ -395,7 +476,7 @@ void Cube::Create(f32 width, f32 depth, f32 height) {
     auto wOver2 = width / 2.f;
     auto hOver2 = height / 2.f;
     auto dOver2 = depth / 2.f;
-    glm::vec3 vertices[] = {
+    std::vector<glm::vec3> positions = {
         {-wOver2, -hOver2, -dOver2}, {-wOver2, hOver2, -dOver2},
         {wOver2, hOver2, -dOver2},   {-wOver2, -hOver2, -dOver2},
         {wOver2, hOver2, -dOver2},   {wOver2, -hOver2, -dOver2},
@@ -416,15 +497,35 @@ void Cube::Create(f32 width, f32 depth, f32 height) {
         {wOver2, -hOver2, dOver2},   {-wOver2, -hOver2, dOver2},
     };
 
+    std::vector<glm::vec3> normals;
+    for (size_t i = 0; i < positions.size(); i += 3) {
+        auto v1 = positions[i] - positions[i + 1];
+        auto v2 = positions[i + 2] - positions[i + 1];
+        auto normal = glm::normalize(glm::cross(v1, v2));
+        normals.push_back(normal);
+        normals.push_back(normal);
+        normals.push_back(normal);
+    }
+
+    std::vector<glm::vec3> positions_normals;
+    for (size_t i = 0; i < positions.size(); ++i) {
+        positions_normals.push_back(positions[i]);
+        positions_normals.push_back(normals[i]);
+    }
+
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * positions_normals.size(),
+                 positions_normals.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(glm::vec3), (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, 6 * sizeof(f32), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, false, 6 * sizeof(f32),
+                          (void*)(3 * sizeof(float)));
 }
 
 Cube::~Cube() {
@@ -443,6 +544,20 @@ void Cube::Render(Shader shader, const Color& color, const glm::mat4& world,
     shader.SetParam("view", camera.GetView());
     shader.SetParam("projection", camera.GetProjection());
     shader.SetParam("color", color);
+    glBindVertexArray(vao);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+void Cube::RenderRefract(Shader shader, const Color& color,
+                         const SkyBox& skybox, const glm::mat4& world,
+                         const Camera& camera) {
+    shader.Bind();
+    shader.SetParam("model", world);
+    shader.SetParam("view", camera.GetView());
+    shader.SetParam("projection", camera.GetProjection());
+    shader.SetParam("camera_pos", camera.GetPosition());
+    shader.SetParam("color", color);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.texture);
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 }
@@ -570,8 +685,8 @@ void BoardBounds::Render(Shader shader, const Color& color,
                 glm::mat4 world(1.f);
                 world = glm::rotate(world, -glm::pi<f32>() / 2,
                                     glm::vec3(0.f, 1.f, 0.f));
-                world = glm::translate(world,
-                                       glm::vec3(0.f, 0.f, -board_dimensions.z));
+                world = glm::translate(
+                    world, glm::vec3(0.f, 0.f, -board_dimensions.z));
                 shader.SetParam("model", world);
                 glBindVertexArray(vao_wall);
                 glDrawArrays(GL_LINES, 0, wall_vertex_count);
@@ -580,10 +695,89 @@ void BoardBounds::Render(Shader shader, const Color& color,
     }
 }
 
+SkyBox::~SkyBox() {}
+
+void SkyBox::Create() {
+    float vertices[] = {
+        -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
+        -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f,
+        1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f,
+        -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,
+        -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,
+        -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,
+        1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f,
+        -1.0f, 1.0f,  -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,
+        1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f,
+        -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,
+        -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f};
+
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * sizeof(f32), (void*)0);
+
+    std::vector<std::string> paths = {
+        "data/skybox/right.jpg", "data/skybox/left.jpg",
+        "data/skybox/top.jpg",   "data/skybox/bottom.jpg",
+        "data/skybox/front.jpg", "data/skybox/back.jpg",
+    };
+    texture = LoadCubemap(paths);
+}
+
+void SkyBox::Render(Shader shader, const Camera& camera) {
+    shader.Bind();
+    shader.SetParam("skybox", 0);
+    shader.SetParam("color", color);
+
+    glDepthFunc(GL_LEQUAL);
+    auto view_no_translation = glm::mat4(glm::mat3(camera.GetView()));
+    shader.SetParam("view", view_no_translation);
+    shader.SetParam("projection", camera.GetProjection());
+    glBindVertexArray(vao);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
+    glDepthFunc(GL_LESS);
+}
+
+u32 SkyBox::LoadCubemap(const std::vector<std::string>& paths) {
+    u32 id;
+    glGenTextures(1, &id);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, id);
+
+    int width, height, nr_components;
+    for (unsigned int i = 0; i < paths.size(); i++) {
+        unsigned char* data =
+            stbi_load(paths[i].c_str(), &width, &height, &nr_components, 0);
+        if (data) {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width,
+                         height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            stbi_image_free(data);
+        } else {
+            printf("Texuture load failure: %s\n", paths[i].c_str());
+            stbi_image_free(data);
+        }
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return id;
+}
+
 void AdvancedRenderer::StartUp(const GameLogic::GameState& state) {
-    tetris_cube.Create(1.f, 1.f, 1.f);
     solid_shader.Create(solid_vs, solid_fs);
+    refract_shader.Create(refract_vs, refract_fs);
+    skybox_shader.Create(skybox_vs, skybox_fs);
+    tetris_cube.Create(1.f, 1.f, 1.f);
     board_bounds.Create(state.board);
+    skybox.Create();
 }
 
 void AdvancedRenderer::Render(const GameLogic::GameState& state,
@@ -591,13 +785,13 @@ void AdvancedRenderer::Render(const GameLogic::GameState& state,
     glViewport(0, 0, framebuffer_width, framebuffer_height);
 
     if (state.phase == GameLogic::GameState::Phase::Lost) {
-        glClearColor(0.2f, 0.1f, 0.1f, 1.f);
+        skybox.color = {0.9f, 0.1f, 0.1f, 1.f};
     } else if (state.phase == GameLogic::GameState::Phase::LayersErase) {
-        glClearColor(0.9f, 0.9f, 0.9f, 1.f);
+        skybox.color = {0.2f, 0.9f, 0.2f, 1.f};
     } else if (state.paused) {
-        glClearColor(0.05f, 0.08f, 0.08f, 1.f);
+        skybox.color = {0.2f, 0.2f, 0.9f, 1.f};
     } else {
-        glClearColor(0.1f, 0.1f, 0.1f, 1.f);
+        skybox.color = {1.f, 1.f, 1.f, 1.f};
     }
 
     glEnable(GL_DEPTH_TEST);
@@ -617,6 +811,8 @@ void AdvancedRenderer::Render(const GameLogic::GameState& state,
     if (state.phase == GameLogic::GameState::Phase::BlockFalling) {
         RenderFallingBlockProjection(state, camera);
     }
+
+    skybox.Render(skybox_shader, camera);
 }
 
 void AdvancedRenderer::RenderBoard(const GameLogic::Board3D& board,
@@ -686,9 +882,9 @@ void AdvancedRenderer::RenderTetrisCube(const glm::vec3& pos,
                                         const Camera& camera) {
     Color cube_edge_color{0.1f, 0.1f, 0.1f};
     RenderCube(pos, cube_edge_color, glm::vec3(1.0f, 1.0f, 1.0f), camera);
-    RenderCube(pos, color, glm::vec3(1.01f, 0.8f, 0.8f), camera);
-    RenderCube(pos, color, glm::vec3(0.8f, 1.01f, 0.8f), camera);
-    RenderCube(pos, color, glm::vec3(0.8f, 0.8f, 1.01f), camera);
+    RenderRefractCube(pos, color, glm::vec3(1.01f, 0.8f, 0.8f), camera);
+    RenderRefractCube(pos, color, glm::vec3(0.8f, 1.01f, 0.8f), camera);
+    RenderRefractCube(pos, color, glm::vec3(0.8f, 0.8f, 1.01f), camera);
 }
 
 void AdvancedRenderer::RenderCube(const glm::vec3& position, const Color& color,
@@ -698,4 +894,14 @@ void AdvancedRenderer::RenderCube(const glm::vec3& position, const Color& color,
     world = glm::translate(world, position);
     world = glm::scale(world, scale);
     tetris_cube.Render(solid_shader, color, world, camera);
+}
+
+void AdvancedRenderer::RenderRefractCube(const glm::vec3& position,
+                                         const Color& color,
+                                         const glm::vec3& scale,
+                                         const Camera& camera) {
+    glm::mat4 world(1.f);
+    world = glm::translate(world, position);
+    world = glm::scale(world, scale);
+    tetris_cube.RenderRefract(refract_shader, color, skybox, world, camera);
 }
