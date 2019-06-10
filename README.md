@@ -32,7 +32,7 @@ Requirements + my thoughts
  *There was no translation requirement. How to play tetris without translating the pieces? ;) I have implemented additional translations (Q/E) to make the game playable.*
  * blocks should have different random colors
  
- *I have implemented this with simple rand() function, but I was not pleased with results. Random is usually not what people say when the are talking about random; if I had more time, I would reimplement it using bag (one or more) of colors shuffled constantly (after iterating all colors)*
+ *I have implemented this with simple rand() function, but I was not pleased with results. Random is usually not what people say when the are talking about random; if I had more time, I would reimplement it using bag (one or more) of colors shuffled constantly (after iterating all colors from one bag, you shuffle it again and repeat; one can also assert that first color from newly shuffled bag is not the same as previous one)*
  * bonus: camera rotations and zoom in/out
  
  *Implemented with additional axis restrictions; zooming implemented by adjusting fov; if i had more time I would filter input and made it more elastic;*
