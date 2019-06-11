@@ -119,7 +119,7 @@ class PerspectiveCamera : public Camera {
 
   private:
     f32 aspect_ratio = 1.0f;
-    f32 fov = glm::pi<f32>() / 2.f;
+    f32 fov = 1.1623f;
     f32 near = 0.1f;
     f32 far = 100.f;
 
@@ -165,15 +165,18 @@ class OrbitCameraController {
         }
 
         // TODO(panmar): Remove when move to OpenGL 3+
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        gluPerspective(glm::degrees(camera->GetFov()), camera->GetAspectRatio(),
-                       camera->GetNear(), camera->GetFar());
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        gluLookAt(camera->GetPosition().x, camera->GetPosition().y,
-                  camera->GetPosition().z, camera->GetTarget().x,
-                  camera->GetTarget().y, camera->GetTarget().z,
-                  camera->GetUp().x, camera->GetUp().y, camera->GetUp().z);
+        if (Settings::graphics_renderer_type == Settings::RendererType::Basic) {
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+            gluPerspective(glm::degrees(camera->GetFov()),
+                           camera->GetAspectRatio(), camera->GetNear(),
+                           camera->GetFar());
+            glMatrixMode(GL_MODELVIEW);
+            glLoadIdentity();
+            gluLookAt(camera->GetPosition().x, camera->GetPosition().y,
+                      camera->GetPosition().z, camera->GetTarget().x,
+                      camera->GetTarget().y, camera->GetTarget().z,
+                      camera->GetUp().x, camera->GetUp().y, camera->GetUp().z);
+        }
     }
 };

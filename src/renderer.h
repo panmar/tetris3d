@@ -14,7 +14,7 @@
 
 class IRenderer {
   public:
-    ~IRenderer() = default;
+    virtual ~IRenderer() = default;
     virtual void StartUp(const GameLogic::GameState& state){};
     virtual void Render(const GameLogic::GameState& state,
                         const Camera& camera) = 0;
@@ -25,6 +25,7 @@ class IRenderer {
 // OpenGL 2.1 renderer
 class BasicRenderer : public IRenderer {
   public:
+    ~BasicRenderer() {}
     void Render(const GameLogic::GameState& state,
                 const Camera& camera) override;
 
@@ -81,7 +82,7 @@ class SkyBox {
   public:
     ~SkyBox();
     void Create();
-    void Render(Shader shader, const Camera& camera);
+    void Render(Shader& shader, const Camera& camera);
 
     // Load order: X, -X, Y, -Y, Z, -Z
     u32 LoadCubemap(const std::vector<std::string>& paths);
@@ -96,9 +97,9 @@ class Cube {
   public:
     void Create(f32 width, f32 depth, f32 height);
     ~Cube();
-    void Render(Shader shader, const Color& color, const glm::mat4& world,
+    void Render(Shader& shader, const Color& color, const glm::mat4& world,
                 const Camera& camera);
-    void RenderRefract(Shader shader, const Color& color, const SkyBox& skybox,
+    void RenderRefract(Shader& shader, const Color& color, const SkyBox& skybox,
                        const glm::mat4& world, const Camera& camera);
 
   private:
@@ -110,7 +111,7 @@ class BoardBounds {
   public:
     ~BoardBounds();
     void Create(const GameLogic::Board3D& board);
-    void Render(Shader shader, const Color& color, const Camera& camera);
+    void Render(Shader& shader, const Color& color, const Camera& camera);
 
   private:
     u32 vbo_wall = 0;
@@ -125,6 +126,7 @@ class BoardBounds {
 // OpenGL 3.3 renderer
 class AdvancedRenderer : public IRenderer {
   public:
+    ~AdvancedRenderer() {}
     void StartUp(const GameLogic::GameState& state) override;
     void Render(const GameLogic::GameState& state,
                 const Camera& camera) override;
@@ -151,6 +153,7 @@ class AdvancedRenderer : public IRenderer {
     i32 framebuffer_height = 0;
 
     Shader solid_shader;
+    Shader solid_wire_shader;
     Shader refract_shader;
     Shader skybox_shader;
     Cube tetris_cube;

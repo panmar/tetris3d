@@ -42,16 +42,11 @@ const i32 key_quit = GLFW_KEY_ESCAPE;
 const i32 key_camera_center = GLFW_KEY_C;
 const i32 key_pause = GLFW_KEY_P;
 
-const u32 map_width = 10;
-const u32 map_depth = 10;
-const u32 map_height = 50;
+const u32 map_width = 7;
+const u32 map_depth = 7;
+const u32 map_height = 18;
 
-// const u32 map_width = 7;
-// const u32 map_depth = 7;
-// const u32 map_height = 18;
-
-const f32 block_init_fall_step_seconds = 1 / 5.f;
-//const f32 block_init_fall_step_seconds = 1 / 1.f;
+const f32 block_init_fall_step_seconds = 1 / 2.f;
 const f32 block_max_fall_step_seconds = 1 / 25.f;
 const f32 block_speed_inc_multiplier = 0.02f;
 const f32 block_speed_inc_period_seconds = 10.f;

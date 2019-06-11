@@ -6,22 +6,48 @@
 namespace {
 
 const std::string solid_vs = R"~(
-
 #version 330 core
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
 
-uniform mat4 model;
+uniform mat4 world;
 uniform mat4 view;
 uniform mat4 projection;
 
 void main() {
-    gl_Position = projection * view * model * vec4(position, 1.0);
+    gl_Position = projection * view * world * vec4(position, 1.0);
 }
 
 )~";
 
 const std::string solid_fs = R"~(
+#version 330 core
+out vec4 finalcolor;
+
+uniform vec4 color;
+
+void main() {
+    finalcolor = color;
+}
+
+)~";
+
+const std::string solid_wire_vs = R"~(
+
+#version 330 core
+layout (location = 0) in vec3 position;
+
+uniform mat4 world;
+uniform mat4 view;
+uniform mat4 projection;
+
+void main() {
+    gl_Position = projection * view * world * vec4(position, 1.0);
+}
+
+)~";
+
+const std::string solid_wire_fs = R"~(
 
 #version 330 core
 out vec4 final_color;
@@ -43,14 +69,14 @@ layout (location = 1) in vec3 aNormal;
 out vec3 Normal;
 out vec3 Position;
 
-uniform mat4 model;
+uniform mat4 world;
 uniform mat4 view;
 uniform mat4 projection;
 
 void main() {
-    Normal = mat3(transpose(inverse(model))) * aNormal;
-    Position = vec3(model * vec4(aPos, 1.0));
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
+    Normal = mat3(transpose(inverse(world))) * aNormal;
+    Position = vec3(world * vec4(aPos, 1.0));
+    gl_Position = projection * view * world * vec4(aPos, 1.0);
 }
 
 )~";
@@ -507,6 +533,8 @@ void Cube::Create(f32 width, f32 depth, f32 height) {
         normals.push_back(normal);
     }
 
+    assert(positions.size() == normals.size());
+
     std::vector<glm::vec3> positions_normals;
     for (size_t i = 0; i < positions.size(); ++i) {
         positions_normals.push_back(positions[i]);
@@ -518,7 +546,7 @@ void Cube::Create(f32 width, f32 depth, f32 height) {
 
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * positions_normals.size(),
+    glBufferData(GL_ARRAY_BUFFER, 2 * sizeof(glm::vec3) * positions.size(),
                  positions_normals.data(), GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
@@ -537,10 +565,10 @@ Cube::~Cube() {
     }
 }
 
-void Cube::Render(Shader shader, const Color& color, const glm::mat4& world,
+void Cube::Render(Shader& shader, const Color& color, const glm::mat4& world,
                   const Camera& camera) {
     shader.Bind();
-    shader.SetParam("model", world);
+    shader.SetParam("world", world);
     shader.SetParam("view", camera.GetView());
     shader.SetParam("projection", camera.GetProjection());
     shader.SetParam("color", color);
@@ -548,11 +576,11 @@ void Cube::Render(Shader shader, const Color& color, const glm::mat4& world,
     glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
-void Cube::RenderRefract(Shader shader, const Color& color,
+void Cube::RenderRefract(Shader& shader, const Color& color,
                          const SkyBox& skybox, const glm::mat4& world,
                          const Camera& camera) {
     shader.Bind();
-    shader.SetParam("model", world);
+    shader.SetParam("world", world);
     shader.SetParam("view", camera.GetView());
     shader.SetParam("projection", camera.GetProjection());
     shader.SetParam("camera_pos", camera.GetPosition());
@@ -632,12 +660,12 @@ void BoardBounds::Create(const GameLogic::Board3D& board) {
     }
 }
 
-void BoardBounds::Render(Shader shader, const Color& color,
+void BoardBounds::Render(Shader& shader, const Color& color,
                          const Camera& camera) {
     // Render ground
     {
         shader.Bind();
-        shader.SetParam("model", glm::mat4(1.f));
+        shader.SetParam("world", glm::mat4(1.f));
         shader.SetParam("view", camera.GetView());
         shader.SetParam("projection", camera.GetProjection());
         shader.SetParam("color", color);
@@ -661,7 +689,7 @@ void BoardBounds::Render(Shader shader, const Color& color,
                 glm::mat4 world(1.f);
                 world = glm::rotate(world, -glm::pi<f32>() / 2,
                                     glm::vec3(0.f, 1.f, 0.f));
-                shader.SetParam("model", world);
+                shader.SetParam("world", world);
                 glBindVertexArray(vao_wall);
                 glDrawArrays(GL_LINES, 0, wall_vertex_count);
             }
@@ -673,7 +701,7 @@ void BoardBounds::Render(Shader shader, const Color& color,
                 glm::mat4 world(1.f);
                 world = glm::translate(world,
                                        glm::vec3(0.f, 0.f, board_dimensions.z));
-                shader.SetParam("model", world);
+                shader.SetParam("world", world);
                 glBindVertexArray(vao_wall);
                 glDrawArrays(GL_LINES, 0, wall_vertex_count);
             }
@@ -687,7 +715,7 @@ void BoardBounds::Render(Shader shader, const Color& color,
                                     glm::vec3(0.f, 1.f, 0.f));
                 world = glm::translate(
                     world, glm::vec3(0.f, 0.f, -board_dimensions.z));
-                shader.SetParam("model", world);
+                shader.SetParam("world", world);
                 glBindVertexArray(vao_wall);
                 glDrawArrays(GL_LINES, 0, wall_vertex_count);
             }
@@ -727,7 +755,7 @@ void SkyBox::Create() {
     texture = LoadCubemap(paths);
 }
 
-void SkyBox::Render(Shader shader, const Camera& camera) {
+void SkyBox::Render(Shader& shader, const Camera& camera) {
     shader.Bind();
     shader.SetParam("skybox", 0);
     shader.SetParam("color", color);
@@ -773,6 +801,7 @@ u32 SkyBox::LoadCubemap(const std::vector<std::string>& paths) {
 
 void AdvancedRenderer::StartUp(const GameLogic::GameState& state) {
     solid_shader.Create(solid_vs, solid_fs);
+    solid_wire_shader.Create(solid_wire_vs, solid_wire_fs);
     refract_shader.Create(refract_vs, refract_fs);
     skybox_shader.Create(skybox_vs, skybox_fs);
     tetris_cube.Create(1.f, 1.f, 1.f);
@@ -804,7 +833,7 @@ void AdvancedRenderer::Render(const GameLogic::GameState& state,
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    board_bounds.Render(solid_shader, Color{0.3f, 0.3f, 0.3f}, camera);
+    board_bounds.Render(solid_wire_shader, Color{0.3f, 0.3f, 0.3f}, camera);
 
     RenderBoard(state.board, camera);
     RenderFallingBlock(state.falling_block, camera);
@@ -813,6 +842,15 @@ void AdvancedRenderer::Render(const GameLogic::GameState& state,
     }
 
     skybox.Render(skybox_shader, camera);
+
+    // TODO(panmar): Make error checking more verbose
+    {
+        auto error = glGetError();
+        if (error != GL_NO_ERROR) {
+            printf("Error = %d\n", error);
+        }
+        assert(error == GL_NO_ERROR);
+    }
 }
 
 void AdvancedRenderer::RenderBoard(const GameLogic::Board3D& board,
@@ -890,6 +928,7 @@ void AdvancedRenderer::RenderTetrisCube(const glm::vec3& pos,
 void AdvancedRenderer::RenderCube(const glm::vec3& position, const Color& color,
                                   const glm::vec3& scale,
                                   const Camera& camera) {
+
     glm::mat4 world(1.f);
     world = glm::translate(world, position);
     world = glm::scale(world, scale);

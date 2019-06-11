@@ -4,6 +4,7 @@ ifeq ($(shell uname -s), Darwin)
 CCFLAGS=-std=c++17 \
 	-Wall -Wno-deprecated-declarations\
 	-g \
+	-I\src\
 	-lglfw -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon
 else
 CCFLAGS=-std=c++17 \
@@ -13,9 +14,7 @@ CCFLAGS=-std=c++17 \
 	-lGLU -lGL -lX11 -lpthread -lXrandr -lXi -ldl
 endif
 
-.PHONY: game
-
-game: src/main.cc \
+FILES=src/main.cc \
 	  src/app.h \
 	  src/app.cc \
 	  src/common.h \
@@ -28,6 +27,18 @@ game: src/main.cc \
 	  src/renderer.h \
 	  src/renderer.cc \
 	  src/settings.h
+
+.PHONY: game
+
+ifeq ($(shell uname -s), Darwin)
+game: $(FILES)
 	mkdir -p bin/
 	g++ src/main.cc src/app.cc src/logic.cc src/renderer.cc src/glad.c \
-	extern/libglfw3.a $(CCFLAGS) -o bin/tetris3d
+	$(CCFLAGS) -o bin/tetris3d
+else
+game: $(FILES)
+	mkdir -p bin/
+	g++ src/main.cc src/app.cc src/logic.cc src/renderer.cc src/glad.c \
+	extern/libglfw3.a
+	$(CCFLAGS) -o bin/tetris3d
+endif
