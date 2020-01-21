@@ -53,7 +53,7 @@ Compilation
 -------------
     make
 
-Futher improvements
+Further improvements
 -------------
 * some functional tests for logic (it is nicely separated so it can be easily testable)
 * more strict tetris rules (e.g. SRS - https://tetris.fandom.com/wiki/SRS)
