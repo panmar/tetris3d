@@ -10,8 +10,9 @@ else
 CCFLAGS=-std=c++17 \
 	-Wall -Wno-deprecated-declarations\
 	-g \
+	-Isrc\ \
 	-static-libstdc++ -static-libgcc \
-	-lGLU -lGL -lX11 -lpthread -lXrandr -lXi -ldl
+	-lGLU -lGL -lX11 -lpthread -ldl
 endif
 
 FILES=src/main.cc \
@@ -33,12 +34,11 @@ FILES=src/main.cc \
 ifeq ($(shell uname -s), Darwin)
 game: $(FILES)
 	mkdir -p bin/
-	g++ src/main.cc src/app.cc src/logic.cc src/renderer.cc src/glad.c \
+	g++ src/main.cc src/app.cc src/logic.cc src/renderer.cc src/glad.cc \
 	$(CCFLAGS) -o bin/tetris3d
 else
 game: $(FILES)
 	mkdir -p bin/
-	g++ src/main.cc src/app.cc src/logic.cc src/renderer.cc src/glad.c \
-	extern/libglfw3.a
-	$(CCFLAGS) -o bin/tetris3d
+	g++ src/main.cc src/app.cc src/logic.cc src/renderer.cc src/glad.cc \
+	extern/libglfw3.a $(CCFLAGS) -o bin/tetris3d
 endif
