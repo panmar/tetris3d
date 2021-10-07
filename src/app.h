@@ -74,7 +74,6 @@ class Tetris3DApp {
 
             std::this_thread::sleep_for(16ms);
         }
-        ShutDown();
     }
 
     void OnKeyChanged(i32 key, i32 scancode, i32 action, i32 mods) {
@@ -152,10 +151,5 @@ class Tetris3DApp {
         glfwSetKeyCallback(window, OnKeyCallback);
 
         return true;
-    }
-
-    void ShutDown() {
-        glfwDestroyWindow(window);
-        glfwTerminate();
     }
 };
