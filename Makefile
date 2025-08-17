@@ -5,16 +5,8 @@ CCFLAGS	:= -std=c++23 \
 	-Isrc -Isrc/third_party \
 	-MMD -MP
 
-UNAME_S := $(shell uname -s)
-
-ifeq ($(UNAME_S), Darwin)
-	LDFLAGS	:= -lglfw \
-		-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
-else ifeq ($(UNAME_S), Linux)
-	GLFW_LIB := src/third_party/libglfw3.a
-	LDFLAGS := $(GLFW_LIB) \
-		-lGL -lX11 -lpthread -ldl -lXrandr -lXi
-endif
+LDFLAGS	:= -lglfw \
+	-framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
 
 SRC_DIR := src
 BIN_DIR := bin
